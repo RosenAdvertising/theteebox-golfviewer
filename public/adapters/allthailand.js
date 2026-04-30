@@ -24,7 +24,8 @@ function parse(html) {
     const country = flag ? (flag.getAttribute('alt') || '').trim() : '';
 
     const todayCell = cells[cells.length - 1];
-    const today = todayCell.textContent.trim();
+    // Score cell has interior whitespace ("−7   (64)") — collapse to first token
+    const today = todayCell.textContent.trim().split(/\s+/)[0];
     const holesPlayed = Number(todayCell.getAttribute('data-holes-played') || '0');
     const thru = holesPlayed === 18 ? 'F' : holesPlayed === 0 ? '—' : String(holesPlayed);
 
@@ -46,7 +47,11 @@ function formatName(name) {
 export default {
   id: 'allthailand',
   name: 'All Thailand Golf Tour',
-  defaultUrl: 'https://www.allthailandgolftour.com/tournaments/gettable/3755/score',
+  // URL pattern: https://www.allthailandgolftour.com/tournaments/gettable/{table_id}/score
+  // The table_id is embedded in the tournament scores page — find it at:
+  //   https://www.allthailandgolftour.com/tournaments/scores/{tournament_id}/men/holebyhole/1
+  // Look for "gettable/NNNNN" in the page source. Update this when a new tournament starts.
+  defaultUrl: '',
   broadcastSearch: '"All Thailand Golf Tour" live',
   parse
 };

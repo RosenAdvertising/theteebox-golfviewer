@@ -16,7 +16,7 @@ node server/index.js
 
 Open http://localhost:8787 in your browser.
 
-1. Pick a tour from the dropdown — PGA, DP World, LIV, LPGA, Korn Ferry, PGA Tour Champions, All Thailand Golf Tour, or "Custom URL"
+1. Pick a tour from the dropdown — PGA, DP World, LIV, LPGA, Korn Ferry, PGA Tour Champions, TGL, All Thailand Golf Tour, or "Custom URL"
 2. Paste a YouTube URL
 3. Watch + see scores update every 60s
 
@@ -42,7 +42,7 @@ Each scoring source has a tiny adapter under `public/adapters/`:
 export default {
   id: 'allthailand',
   name: 'All Thailand Golf Tour',
-  defaultUrl: 'https://www.allthailandgolftour.com/tournaments/gettable/3755/score',
+  defaultUrl: 'https://www.allthailandgolftour.com/tournaments/gettable/{table_id}/score',
   parse(html) {
     // returns { columns: [...], rows: [...] }
   }
@@ -51,12 +51,14 @@ export default {
 
 To add a new tour, drop a new file in `public/adapters/` and register it in `public/adapters/index.js`.
 
+**All Thailand Golf Tour URL:** The `defaultUrl` is intentionally blank — the table ID changes each tournament. Find it by opening the tournament scores page and searching the source for `gettable/NNNNN`. See [`public/adapters/allthailand.js`](public/adapters/allthailand.js) for details.
+
 ## Roadmap
 
 Inspired by [MultiViewer for F1](https://multiviewer.app/) — full mapping in [SPEC.md](SPEC.md).
 
-- **v0** (current): YT player + leaderboard, 60s refresh, two adapters (All Thailand, Custom URL), graceful empty state
-- **v0.x**: more tour adapters (PGA, DP World, LIV, LPGA, KFT, Asian); player highlight/follow; sortable columns; persisted layout
+- **v0** (current): YT player + leaderboard, 60s refresh, 9 adapters (PGA, DP World, LIV, LPGA, Korn Ferry, Champions, TGL, All Thailand, Custom URL), graceful empty state
+- **v0.x**: Asian Tour + LET adapters (OCS Sport); player highlight/follow; sortable columns; saveable layouts
 - **v1**: hole-by-hole scorecard, multi-player compare, score-progression chart per round
 - **v1.x**: multi-stream layout (multiviewer-style) — N panes draggable/resizable, picture-in-picture, saved presets
 - **v2**: shot tracer / strokes-gained per shot overlays where public APIs allow; hole map with player positions

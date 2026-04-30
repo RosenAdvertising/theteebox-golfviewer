@@ -4,6 +4,7 @@ import liv from './liv.js';
 import lpga from './lpga.js';
 import kornferry from './kornferry.js';
 import champions from './champions.js';
+import tgl from './tgl.js';
 import allthailand from './allthailand.js';
 import custom from './custom.js';
 
@@ -14,6 +15,7 @@ export const ADAPTERS = [
   lpga,
   kornferry,
   champions,
+  tgl,
   allthailand,
   custom
 ];

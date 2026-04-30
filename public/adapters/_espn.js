@@ -46,9 +46,11 @@ function parseFactory(league) {
 
       const thru = (() => {
         if (status.thru != null) return String(status.thru);
+        // Fallback for non-live state: count rounds with scores
         const completed = linescores.filter(ls => ls.value != null).length;
         if (completed === 0) return '—';
-        if (completed >= 4) return 'F';
+        // All rounds complete (works for 3-round formats like LIV/Champions too)
+        if (linescores.length > 0 && completed >= linescores.length) return 'F';
         return '—';
       })();
 

@@ -72,9 +72,9 @@ Tier 1 total ≈ 1 week of focused work. Captures ~60% of the MV vibe.
 - **Allowlist is the security boundary.** Every new adapter requires an entry in `server/allowlist.json`. Document this in CONTRIBUTING.md (already done).
 - **Don't build telemetry mocks.** Tempting to fake shot-tracer overlays for demo-ware; resist. The adapter shell is a real product; fake telemetry isn't.
 
-## Open questions for Toby
+## Open questions
 
-1. Tier 1 order OK? Recommend (4) saveable layouts → (1) click-to-highlight → (2) no-spoilers → (3) score-by-hole → (5) shortcuts.
-2. Should "Custom URL" stay in the dropdown or become an "Add custom source" button hidden behind a settings menu? It's a v0 fallback that probably doesn't need top-level placement once we have 8 real tours.
-3. DataGolf API ($) gating — worth it for v1? Win-prob + live SG would be the closest thing to MV's telemetry overlay golf can get.
-4. OCS reverse engineering — green-light to spend a day on it once an Asian Tour or LET event is live and we can DevTools-capture?
+1. **Tier 1 order** — recommended sequence: (4) saveable layouts → (1) click-to-highlight → (2) no-spoilers → (3) score-by-hole → (5) shortcuts. Opinions welcome in issues.
+2. **Custom URL placement** — should it stay top-level in the dropdown, or move behind a settings menu once we have 8+ real tours? The current placement is v0 pragmatism; happy to revisit.
+3. **DataGolf API** — win probability + live strokes-gained would be the closest golf equivalent to MV's telemetry overlays. Out of scope until there's a reason to pay for it. Flag in issues if this matters to you.
+4. **OCS adapter (Asian Tour + LET)** — needs a DevTools capture session against a live event to reverse-engineer the endpoint. If you have access to a live Asian Tour or LET feed, open an issue — this would cover two tours with one adapter.
