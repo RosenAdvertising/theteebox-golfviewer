@@ -1,0 +1,18 @@
+{
+  "name": "theteebox-golfviewer",
+  "version": "0.1.0",
+  "description": "Local, open-source dashboard for watching golf with a live leaderboard side-by-side.",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RosenAdvertising/theteebox-golfviewer"
+  }
+}

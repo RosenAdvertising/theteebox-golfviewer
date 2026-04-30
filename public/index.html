@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Teebox — Golf Viewer</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <header class="bar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span class="name">Teebox</span>
+      <span class="tag">golf, side-by-side</span>
+    </div>
+    <div class="controls">
+      <label class="field">
+        <span>Tour</span>
+        <select id="tour"></select>
+      </label>
+      <label class="field grow">
+        <span>Scores URL</span>
+        <input id="scoresUrl" type="url" spellcheck="false" autocomplete="off" placeholder="https://…">
+      </label>
+      <label class="field grow">
+        <span>YouTube URL</span>
+        <input id="ytUrl" type="url" spellcheck="false" autocomplete="off" placeholder="https://youtube.com/watch?v=…">
+      </label>
+      <button id="refreshNow" type="button" title="Refresh now">↻</button>
+      <button id="togglePause" type="button" title="Pause/resume auto-refresh">⏸</button>
+    </div>
+    <div class="status" id="status">idle</div>
+  </header>
+
+  <main class="split">
+    <section class="pane video">
+      <div class="landing" id="videoEmpty">
+        <div class="landing-mark">
+          <div class="landing-dot"></div>
+          <div class="landing-word">Teebox</div>
+        </div>
+        <div class="landing-tag">Watch golf with a leaderboard side-by-side.</div>
+        <div class="landing-hint">Paste a YouTube URL <span class="kbd">↑</span> to start watching.</div>
+        <div class="landing-actions">
+          <a id="findBroadcasts" class="btn-primary" href="#" target="_blank" rel="noopener">Find broadcasts on YouTube ↗</a>
+        </div>
+        <ul class="landing-tips">
+          <li>Leaderboard refreshes every 60s automatically</li>
+          <li>Drag the divider to resize panes</li>
+          <li>Pick a different tour from the dropdown <span class="kbd">↑</span></li>
+        </ul>
+      </div>
+      <iframe id="ytFrame" hidden allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </section>
+
+    <div class="divider" id="divider" title="drag to resize"></div>
+
+    <section class="pane scores">
+      <div class="scores-head">
+        <div class="title" id="scoresTitle">Leaderboard</div>
+        <div class="meta" id="scoresMeta"></div>
+      </div>
+      <div class="table-wrap" id="tableWrap">
+        <div class="empty" id="scoresEmpty">pick a tour and click ↻</div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
