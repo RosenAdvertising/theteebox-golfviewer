@@ -142,15 +142,28 @@ Adapter normalizes to:
 }
 ```
 
-## Future tours (post-v0)
+## Tours in v0.2
 
-- PGA Tour leaderboard
-- DP World Tour
-- LIV Golf
-- LPGA Tour
-- Korn Ferry Tour
-- Asian Tour
-- Each will be its own adapter file. Some may need a real API (PGA's leaderboard has a public-ish JSON endpoint) — the adapter abstraction handles either path.
+ESPN's undocumented public API at `site.api.espn.com/apis/site/v2/sports/golf/{league}/scoreboard` returns the same JSON shape for every tour they cover. One shared `_espn.js` factory backs six adapters:
+
+- **PGA Tour** — `pga`
+- **DP World Tour** — `eur` (legacy "European Tour" code)
+- **LIV Golf** — `liv` (individual leaderboard only; team standings not in any free feed)
+- **LPGA Tour** — `lpga`
+- **Korn Ferry Tour** — `ntw` (legacy "Nationwide" code, predates Korn Ferry rename)
+- **PGA Tour Champions** — `champions-tour`
+
+Plus:
+- **All Thailand Golf Tour** — direct HTML scrape (`allthailandgolftour.com`)
+- **Custom URL** — generic fallback for any HTML table
+
+See [`docs/research/tour-sources.md`](docs/research/tour-sources.md) for full per-tour analysis.
+
+### Future tours (post-v0.2)
+
+- **Asian Tour** + **Ladies European Tour** — both run on OCS Sport (different vendor than ESPN). One OCS adapter would cover both, but reverse-engineering needs a live-event DevTools capture.
+- **TGL** — ESPN league code `tgl`, easy add via the same factory.
+- **Olympic golf** — `mens-olympics-golf` / `womens-olympics-golf`.
 
 ## Inspirations & longer-term roadmap
 

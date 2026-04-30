@@ -16,7 +16,7 @@ node server/index.js
 
 Open http://localhost:8787 in your browser.
 
-1. Pick a tour from the dropdown (or "Custom URL")
+1. Pick a tour from the dropdown — PGA, DP World, LIV, LPGA, Korn Ferry, PGA Tour Champions, All Thailand Golf Tour, or "Custom URL"
 2. Paste a YouTube URL
 3. Watch + see scores update every 60s
 
