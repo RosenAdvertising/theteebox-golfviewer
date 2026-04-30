@@ -8,6 +8,15 @@ Zero external dependencies. Runs on Node 18+. Single HTML page + a tiny proxy se
 
 ## Quick start
 
+**macOS — double-click launcher (easiest):**
+
+1. Download the repo as a zip or clone it
+2. Double-click `teebox.command` — Terminal opens, server starts, browser opens automatically
+
+> First time: macOS may block it. Right-click → Open → Open to allow it. You only need to do this once.
+
+**Command line:**
+
 ```bash
 git clone https://github.com/RosenAdvertising/theteebox-golfviewer.git
 cd theteebox-golfviewer
@@ -15,6 +24,8 @@ node server/index.js
 ```
 
 Open http://localhost:8787 in your browser.
+
+**Requirements:** Node.js 18 or newer — [nodejs.org](https://nodejs.org)
 
 1. Pick a tour from the dropdown — PGA, DP World, LIV, LPGA, Korn Ferry, PGA Tour Champions, TGL, All Thailand Golf Tour, or "Custom URL"
 2. Paste a YouTube URL
