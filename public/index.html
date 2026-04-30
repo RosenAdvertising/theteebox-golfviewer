@@ -67,6 +67,62 @@
     </section>
   </main>
 
+  <div class="wizard" id="wizard" hidden role="dialog" aria-modal="true" aria-labelledby="wizardTitle">
+    <div class="wizard-backdrop" data-wizard-dismiss></div>
+    <div class="wizard-card" role="document">
+      <header class="wizard-head">
+        <div class="brand">
+          <span class="dot"></span>
+          <span class="name">Teebox</span>
+        </div>
+        <button class="wizard-x" type="button" data-wizard-dismiss aria-label="Close">✕</button>
+      </header>
+
+      <div class="wizard-body">
+        <section class="wizard-step" data-step="1">
+          <h2 id="wizardTitle" class="wizard-title">Pick a tour</h2>
+          <p class="wizard-copy">Teebox renders any leaderboard through a tour adapter. Pick one to start — you can switch later.</p>
+          <label class="field grow">
+            <span>Tour</span>
+            <select id="wizardTour"></select>
+          </label>
+        </section>
+
+        <section class="wizard-step" data-step="2" hidden>
+          <h2 class="wizard-title">Drop a YouTube URL</h2>
+          <p class="wizard-copy">Paste a broadcast link — or skip and use the broadcast-search shortcut later.</p>
+          <label class="field grow">
+            <span>YouTube URL</span>
+            <input id="wizardYt" type="url" spellcheck="false" autocomplete="off" placeholder="https://youtube.com/watch?v=…">
+          </label>
+          <p class="wizard-hint">No URL? No problem. You'll get a "Find broadcasts on YouTube" button on the next screen.</p>
+        </section>
+
+        <section class="wizard-step" data-step="3" hidden>
+          <h2 class="wizard-title">You're set</h2>
+          <ul class="wizard-bullets">
+            <li>Leaderboard refreshes every 60 seconds.</li>
+            <li>Drag the divider to resize panes.</li>
+            <li>Hit <span class="kbd">↻</span> to refresh now, <span class="kbd">⏸</span> to pause.</li>
+          </ul>
+        </section>
+      </div>
+
+      <footer class="wizard-foot">
+        <div class="wizard-dots" aria-hidden="true">
+          <span class="wizard-dot is-active"></span>
+          <span class="wizard-dot"></span>
+          <span class="wizard-dot"></span>
+        </div>
+        <div class="wizard-actions">
+          <button type="button" class="wizard-btn ghost" id="wizardBack" hidden>Back</button>
+          <button type="button" class="wizard-btn ghost" id="wizardSkip" data-wizard-dismiss>Skip</button>
+          <button type="button" class="wizard-btn primary" id="wizardNext">Next →</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+
   <script type="module" src="app.js"></script>
 </body>
 </html>

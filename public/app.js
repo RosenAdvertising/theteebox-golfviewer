@@ -25,6 +25,24 @@ const els = {
 let timer = null;
 let paused = false;
 
+// --- persistence ---
+const STORE_KEY = 'teebox.v1';
+const stored = (() => {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); }
+  catch { return {}; }
+})();
+
+function persist() {
+  const data = {
+    tour:      els.tour.value,
+    scoresUrl: els.scoresUrl.value.trim(),
+    ytUrl:     els.ytUrl.value.trim(),
+    splitPct:  splitPct
+  };
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+  catch { /* private mode etc */ }
+}
+
 // --- tour selector ---
 for (const a of ADAPTERS) {
   const opt = document.createElement('option');
@@ -32,18 +50,23 @@ for (const a of ADAPTERS) {
   opt.textContent = a.name;
   els.tour.appendChild(opt);
 }
+if (stored.tour && ADAPTERS.some(a => a.id === stored.tour)) {
+  els.tour.value = stored.tour;
+}
 
-function applyAdapterDefaults() {
+function applyAdapterDefaults({ keepScoresUrl = false } = {}) {
   const a = getAdapter(els.tour.value);
-  els.scoresUrl.value = a.defaultUrl || '';
+  if (!keepScoresUrl) els.scoresUrl.value = a.defaultUrl || '';
   els.scoresTitle.textContent = a.name;
   const q = a.broadcastSearch || `${a.name} live`;
   els.findBroadcasts.href = `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
 }
 els.tour.addEventListener('change', () => {
   applyAdapterDefaults();
+  persist();
   loadScores();
 });
+els.scoresUrl.addEventListener('change', () => { persist(); loadScores(); });
 
 // --- youtube ---
 function youtubeIdFromUrl(raw) {
@@ -80,7 +103,7 @@ function applyYoutube() {
 let ytDebounce;
 els.ytUrl.addEventListener('input', () => {
   clearTimeout(ytDebounce);
-  ytDebounce = setTimeout(applyYoutube, 250);
+  ytDebounce = setTimeout(() => { applyYoutube(); persist(); }, 250);
 });
 
 // --- scores ---
@@ -88,6 +111,7 @@ async function loadScores() {
   const adapter = getAdapter(els.tour.value);
   const url = els.scoresUrl.value.trim();
   if (!url) {
+    showScoresMessage('Paste a scoring URL above, or pick a tour with a built-in source.', 'idle');
     setStatus('no url', 'idle');
     return;
   }
@@ -98,8 +122,32 @@ async function loadScores() {
     renderTable(data);
     setStatus(`updated ${formatTime(new Date())}`, 'live');
   } catch (err) {
-    setStatus(err.message, 'error');
+    showScoresMessage(friendlyError(err), 'error');
+    setStatus('error', 'error');
   }
+}
+
+function friendlyError(err) {
+  const msg = String(err && err.message || err);
+  if (msg.includes('proxy 403')) {
+    return "That host isn't on the proxy allowlist. Edit server/allowlist.json to add it, then restart the server.";
+  }
+  if (msg.includes('proxy 502') || msg.includes('Upstream fetch failed')) {
+    return "Couldn't reach the scoring site — it may be down, or the URL is wrong. Check the URL and try again in a minute.";
+  }
+  if (msg.includes('proxy 400')) {
+    return "The proxy didn't like that URL. Make sure it's a full https://… link.";
+  }
+  return msg;
+}
+
+function showScoresMessage(text, kind = 'idle') {
+  clear(els.tableWrap);
+  const div = document.createElement('div');
+  div.className = `empty${kind === 'error' ? ' empty-error' : ''}`;
+  div.textContent = text;
+  els.tableWrap.appendChild(div);
+  els.scoresMeta.textContent = '';
 }
 
 async function fetchProxied(url) {
@@ -205,18 +253,117 @@ els.pauseBtn.addEventListener('click', () => {
 
 // --- resizer ---
 let dragging = false;
+let splitPct = typeof stored.splitPct === 'number' ? stored.splitPct : 50;
+function applySplit(pct) {
+  splitPct = Math.max(20, Math.min(80, pct));
+  els.split.style.setProperty('--left',  `${splitPct}fr`);
+  els.split.style.setProperty('--right', `${100 - splitPct}fr`);
+}
+applySplit(splitPct);
+
 els.divider.addEventListener('mousedown', () => { dragging = true; document.body.style.cursor = 'col-resize'; });
-window.addEventListener('mouseup', () => { dragging = false; document.body.style.cursor = ''; });
+window.addEventListener('mouseup', () => {
+  if (dragging) persist();
+  dragging = false;
+  document.body.style.cursor = '';
+});
 window.addEventListener('mousemove', e => {
   if (!dragging) return;
-  const w = window.innerWidth;
-  const pct = Math.max(20, Math.min(80, (e.clientX / w) * 100));
-  els.split.style.setProperty('--left',  `${pct}fr`);
-  els.split.style.setProperty('--right', `${100 - pct}fr`);
+  applySplit((e.clientX / window.innerWidth) * 100);
 });
 
 // --- boot ---
-applyAdapterDefaults();
+if (stored.scoresUrl) els.scoresUrl.value = stored.scoresUrl;
+if (stored.ytUrl) els.ytUrl.value = stored.ytUrl;
+applyAdapterDefaults({ keepScoresUrl: !!stored.scoresUrl });
 applyYoutube();
 loadScores();
 startTimer();
+
+// --- first-launch wizard ---
+const WIZARD_KEY = 'teebox.welcomed';
+
+function safeGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
+function safeSet(k, v) { try { localStorage.setItem(k, v); } catch { /* ignore */ } }
+
+function initWizard() {
+  if (safeGet(WIZARD_KEY) === '1') return;
+
+  const root      = document.getElementById('wizard');
+  const wTour     = document.getElementById('wizardTour');
+  const wYt       = document.getElementById('wizardYt');
+  const btnBack   = document.getElementById('wizardBack');
+  const btnNext   = document.getElementById('wizardNext');
+  const dots      = root.querySelectorAll('.wizard-dot');
+  const steps     = root.querySelectorAll('.wizard-step');
+  const dismissEls = root.querySelectorAll('[data-wizard-dismiss]');
+
+  for (const a of ADAPTERS) {
+    const opt = document.createElement('option');
+    opt.value = a.id; opt.textContent = a.name;
+    wTour.appendChild(opt);
+  }
+  wTour.value = els.tour.value;
+
+  let step = 1;
+  const total = steps.length;
+
+  function render() {
+    steps.forEach(s => { s.hidden = Number(s.dataset.step) !== step; });
+    dots.forEach((d, i) => d.classList.toggle('is-active', i === step - 1));
+    btnBack.hidden = step === 1;
+    btnNext.textContent = step === total ? 'Start watching' : 'Next →';
+    const focusTarget =
+      step === 1 ? wTour :
+      step === 2 ? wYt :
+      btnNext;
+    setTimeout(() => focusTarget.focus(), 0);
+  }
+
+  function commitAndClose() {
+    if (wTour.value && wTour.value !== els.tour.value) {
+      els.tour.value = wTour.value;
+      applyAdapterDefaults();
+    }
+    const yt = (wYt.value || '').trim();
+    if (yt) {
+      els.ytUrl.value = yt;
+      applyYoutube();
+    }
+    safeSet(WIZARD_KEY, '1');
+    persist();
+    root.hidden = true;
+    document.removeEventListener('keydown', onKey);
+    loadScores();
+    els.tour.focus();
+  }
+
+  function onKey(e) {
+    if (e.key === 'Escape') { e.preventDefault(); commitAndClose(); return; }
+    if (e.key === 'Tab') trapFocus(e);
+  }
+
+  function trapFocus(e) {
+    const focusables = root.querySelectorAll(
+      'button:not([hidden]), select, input, [tabindex]:not([tabindex="-1"])'
+    );
+    const visible = Array.from(focusables).filter(el => !el.closest('[hidden]'));
+    if (!visible.length) return;
+    const first = visible[0], last = visible[visible.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+
+  btnBack.addEventListener('click', () => { if (step > 1) { step--; render(); } });
+  btnNext.addEventListener('click', () => {
+    if (step < total) { step++; render(); }
+    else commitAndClose();
+  });
+  dismissEls.forEach(el => el.addEventListener('click', commitAndClose));
+  document.addEventListener('keydown', onKey);
+
+  root.hidden = false;
+  render();
+}
+
+initWizard();
