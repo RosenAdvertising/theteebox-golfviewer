@@ -5,21 +5,28 @@ const REFRESH_MS = 60_000;
 const $ = (sel) => document.querySelector(sel);
 
 const els = {
-  tour:           $('#tour'),
-  scoresUrl:      $('#scoresUrl'),
-  ytUrl:          $('#ytUrl'),
-  ytFrame:        $('#ytFrame'),
-  videoEmpty:     $('#videoEmpty'),
-  refreshBtn:     $('#refreshNow'),
-  pauseBtn:       $('#togglePause'),
-  status:         $('#status'),
-  scoresMeta:     $('#scoresMeta'),
-  scoresTitle:    $('#scoresTitle'),
-  scoresEmpty:    $('#scoresEmpty'),
-  tableWrap:      $('#tableWrap'),
-  divider:        $('#divider'),
-  split:          document.querySelector('.split'),
-  findBroadcasts: $('#findBroadcasts')
+  tour:            $('#tour'),
+  scoresUrl:       $('#scoresUrl'),
+  ytUrl:           $('#ytUrl'),
+  ytFrame:         $('#ytFrame'),
+  videoEmpty:      $('#videoEmpty'),
+  refreshBtn:      $('#refreshNow'),
+  pauseBtn:        $('#togglePause'),
+  fontToggle:      $('#fontToggle'),
+  shortcutHelp:    $('#shortcutHelp'),
+  shortcutOverlay: $('#shortcutOverlay'),
+  shortcutClose:   $('#shortcutClose'),
+  shortcutBackdrop:$('#shortcutBackdrop'),
+  status:          $('#status'),
+  scoresMeta:      $('#scoresMeta'),
+  scoresTitle:     $('#scoresTitle'),
+  scoresEmpty:     $('#scoresEmpty'),
+  tableWrap:       $('#tableWrap'),
+  scoresPane:      document.querySelector('.pane.scores'),
+  videoPane:       document.querySelector('.pane.video'),
+  divider:         $('#divider'),
+  split:           document.querySelector('.split'),
+  findBroadcasts:  $('#findBroadcasts')
 };
 
 let timer = null;
@@ -116,6 +123,7 @@ async function loadScores() {
     return;
   }
   setStatus('loading…', 'live');
+  els.tableWrap.classList.add('loading');
   try {
     const html = await fetchProxied(url);
     const data = adapter.parse(html);
@@ -124,6 +132,8 @@ async function loadScores() {
   } catch (err) {
     showScoresMessage(friendlyError(err), 'error');
     setStatus('error', 'error');
+  } finally {
+    els.tableWrap.classList.remove('loading');
   }
 }
 
@@ -247,8 +257,83 @@ function stopTimer() {
 els.refreshBtn.addEventListener('click', loadScores);
 els.pauseBtn.addEventListener('click', () => {
   paused = !paused;
-  els.pauseBtn.textContent = paused ? '▶' : '⏸';
+  els.pauseBtn.textContent = paused ? '▶ Resume' : '⏸ Pause';
   if (paused) stopTimer(); else startTimer();
+});
+
+// --- font size ---
+const FONT_SIZES = ['compact', 'normal', 'large'];
+const FONT_KEY = 'teebox.fontsize';
+let fontIdx = Math.max(0, FONT_SIZES.indexOf(safeGet(FONT_KEY) || 'normal'));
+
+function applyFontSize() {
+  els.scoresPane.dataset.fontsize = FONT_SIZES[fontIdx];
+  safeSet(FONT_KEY, FONT_SIZES[fontIdx]);
+  els.fontToggle.title = `Font size: ${FONT_SIZES[fontIdx]} (click to cycle)`;
+}
+applyFontSize();
+
+els.fontToggle.addEventListener('click', () => {
+  fontIdx = (fontIdx + 1) % FONT_SIZES.length;
+  applyFontSize();
+});
+
+// --- keyboard shortcuts ---
+function toggleShortcuts() {
+  els.shortcutOverlay.hidden = !els.shortcutOverlay.hidden;
+}
+
+els.shortcutHelp.addEventListener('click', toggleShortcuts);
+els.shortcutClose.addEventListener('click', toggleShortcuts);
+els.shortcutBackdrop.addEventListener('click', toggleShortcuts);
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+  switch (e.key) {
+    case 'r':
+    case 'R':
+      e.preventDefault();
+      loadScores();
+      break;
+    case 'f':
+    case 'F':
+      e.preventDefault();
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      } else {
+        els.videoPane.requestFullscreen().catch(() => {});
+      }
+      break;
+    case '[':
+      e.preventDefault();
+      applySplit(splitPct - 5);
+      persist();
+      break;
+    case ']':
+      e.preventDefault();
+      applySplit(splitPct + 5);
+      persist();
+      break;
+    case 'a':
+    case 'A':
+      if (e.shiftKey) break;
+      e.preventDefault();
+      fontIdx = (fontIdx + 1) % FONT_SIZES.length;
+      applyFontSize();
+      break;
+    case '?':
+      e.preventDefault();
+      toggleShortcuts();
+      break;
+    case 'Escape':
+      if (!els.shortcutOverlay.hidden) {
+        e.preventDefault();
+        els.shortcutOverlay.hidden = true;
+      }
+      break;
+  }
 });
 
 // --- resizer ---

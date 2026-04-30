@@ -30,8 +30,10 @@
         <span>YouTube URL</span>
         <input id="ytUrl" type="url" spellcheck="false" autocomplete="off" placeholder="https://youtube.com/watch?v=…">
       </label>
-      <button id="refreshNow" type="button" title="Refresh now">↻</button>
-      <button id="togglePause" type="button" title="Pause/resume auto-refresh">⏸</button>
+      <button id="fontToggle" type="button" title="Toggle font size">Aa</button>
+      <button id="refreshNow" type="button" title="Refresh scores  [R]">↻ Refresh</button>
+      <button id="togglePause" type="button" title="Pause/resume auto-refresh">⏸ Pause</button>
+      <button id="shortcutHelp" type="button" title="Keyboard shortcuts  [?]">?</button>
     </div>
     <div class="status" id="status">ready</div>
   </header>
@@ -123,6 +125,25 @@
           <button type="button" class="wizard-btn primary" id="wizardNext">Next →</button>
         </div>
       </footer>
+    </div>
+  </div>
+
+  <div class="shortcut-overlay" id="shortcutOverlay" hidden>
+    <div class="shortcut-backdrop" id="shortcutBackdrop"></div>
+    <div class="shortcut-card">
+      <div class="shortcut-head">
+        <span class="shortcut-title">Keyboard shortcuts</span>
+        <button class="wizard-x" id="shortcutClose" aria-label="Close">✕</button>
+      </div>
+      <ul class="shortcut-list">
+        <li><kbd>R</kbd> Reload leaderboard</li>
+        <li><kbd>F</kbd> Fullscreen video pane</li>
+        <li><kbd>[</kbd> More leaderboard</li>
+        <li><kbd>]</kbd> More video</li>
+        <li><kbd>A</kbd> Cycle font size</li>
+        <li><kbd>?</kbd> Toggle this overlay</li>
+        <li><kbd>Esc</kbd> Close overlay</li>
+      </ul>
     </div>
   </div>
 

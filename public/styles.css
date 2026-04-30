@@ -267,6 +267,86 @@ table.lb tbody tr:hover { background: #1a2230; }
 .score-even { color: var(--text); }
 .country-flag { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
 
+/* --- loading state --- */
+.table-wrap.loading { opacity: 0.35; pointer-events: none; transition: opacity 0.15s; }
+
+/* --- font size variants on leaderboard pane --- */
+.pane.scores[data-fontsize="compact"] table.lb th,
+.pane.scores[data-fontsize="compact"] table.lb td { padding: 5px 10px; font-size: 12px; }
+.pane.scores[data-fontsize="normal"]  table.lb th,
+.pane.scores[data-fontsize="normal"]  table.lb td { padding: 9px 10px; font-size: 15px; }
+.pane.scores[data-fontsize="large"]   table.lb th,
+.pane.scores[data-fontsize="large"]   table.lb td { padding: 11px 10px; font-size: 17px; }
+.pane.scores[data-fontsize="normal"]  .scores-head .title { font-size: 15px; }
+.pane.scores[data-fontsize="large"]   .scores-head .title { font-size: 16px; }
+.pane.scores[data-fontsize="compact"] table.lb thead th { font-size: 9px; }
+.pane.scores[data-fontsize="normal"]  table.lb thead th { font-size: 11px; }
+.pane.scores[data-fontsize="large"]   table.lb thead th { font-size: 12px; }
+
+/* --- shortcut overlay --- */
+.shortcut-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.shortcut-overlay[hidden] { display: none; }
+.shortcut-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+}
+.shortcut-card {
+  position: relative;
+  width: min(340px, calc(100vw - 32px));
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+  overflow: hidden;
+}
+.shortcut-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-2);
+}
+.shortcut-title { font-weight: 600; font-size: 13px; }
+.shortcut-list {
+  list-style: none;
+  padding: 16px 20px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.shortcut-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text);
+}
+.shortcut-list kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-size: 11px;
+  font-family: inherit;
+  color: var(--muted);
+  background: var(--panel-2);
+  white-space: nowrap;
+}
+
 /* --- advanced data source toggle --- */
 .advanced-toggle {
   display: flex;

@@ -63,7 +63,7 @@ function parseFactory(league) {
 
       return {
         pos,
-        score: c.score || 'E',
+        score: c.score != null ? c.score : '—',
         player: athlete.displayName || athlete.fullName || '',
         country,
         thru,
