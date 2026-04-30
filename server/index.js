@@ -58,6 +58,7 @@ async function proxy(req, res) {
 
   try {
     const upstream = await fetch(target.toString(), {
+      signal: AbortSignal.timeout(30_000),
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Teebox/0.1',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'

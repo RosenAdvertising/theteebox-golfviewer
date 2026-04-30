@@ -114,6 +114,9 @@ els.ytUrl.addEventListener('input', () => {
 });
 
 // --- scores ---
+let failCount = 0;
+const MAX_FAILS = 5;
+
 async function loadScores() {
   const adapter = getAdapter(els.tour.value);
   const url = els.scoresUrl.value.trim();
@@ -128,10 +131,17 @@ async function loadScores() {
     const html = await fetchProxied(url);
     const data = adapter.parse(html);
     renderTable(data);
+    failCount = 0;
     setStatus(`updated ${formatTime(new Date())}`, 'live');
   } catch (err) {
-    showScoresMessage(friendlyError(err), 'error');
-    setStatus('error', 'error');
+    failCount++;
+    if (failCount >= MAX_FAILS) {
+      showScoresMessage('Leaderboard unavailable after multiple attempts. Auto-refresh is still running — or click Refresh to try now.', 'error');
+      setStatus('unavailable', 'error');
+    } else {
+      showScoresMessage(friendlyError(err), 'error');
+      setStatus('error', 'error');
+    }
   } finally {
     els.tableWrap.classList.remove('loading');
   }
