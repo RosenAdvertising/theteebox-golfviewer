@@ -264,8 +264,46 @@ table.lb tbody tr:hover { background: #1a2230; }
 .player { text-align: left !important; }
 .score-neg { color: var(--accent); font-weight: 600; }
 .score-pos { color: var(--red); }
-.score-even { color: var(--muted); }
+.score-even { color: var(--text); }
 .country-flag { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
+
+/* --- advanced data source toggle --- */
+.advanced-toggle {
+  display: flex;
+  align-items: end;
+}
+.advanced-summary {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  cursor: pointer;
+  user-select: none;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-2);
+  white-space: nowrap;
+  list-style: none;
+}
+.advanced-summary::-webkit-details-marker { display: none; }
+.advanced-summary::after { content: ' ▾'; }
+.advanced-toggle[open] .advanced-summary::after { content: ' ▴'; }
+.advanced-toggle[open] {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+.advanced-toggle[open] .advanced-summary {
+  border-radius: 6px 6px 0 0;
+  border-bottom-color: var(--accent-dim);
+}
+.advanced-toggle[open] .field.grow {
+  min-width: 260px;
+}
 
 /* --- first-launch wizard --- */
 .wizard {

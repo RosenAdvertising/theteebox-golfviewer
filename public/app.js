@@ -111,8 +111,8 @@ async function loadScores() {
   const adapter = getAdapter(els.tour.value);
   const url = els.scoresUrl.value.trim();
   if (!url) {
-    showScoresMessage('Paste a scoring URL above, or pick a tour with a built-in source.', 'idle');
-    setStatus('no url', 'idle');
+    showScoresMessage('Pick a tour from the dropdown above. For All Thailand Golf Tour, expand "Data source" and paste the scoring URL.', 'idle');
+    setStatus('ready', 'idle');
     return;
   }
   setStatus('loading…', 'live');
@@ -130,7 +130,7 @@ async function loadScores() {
 function friendlyError(err) {
   const msg = String(err && err.message || err);
   if (msg.includes('proxy 403')) {
-    return "That host isn't on the proxy allowlist. Edit server/allowlist.json to add it, then restart the server.";
+    return "This data source isn't available. Try a different tour or check the URL.";
   }
   if (msg.includes('proxy 502') || msg.includes('Upstream fetch failed')) {
     return "Couldn't reach the scoring site — it may be down, or the URL is wrong. Check the URL and try again in a minute.";

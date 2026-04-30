@@ -48,6 +48,10 @@ async function proxy(req, res) {
     return send(res, 400, 'Invalid URL');
   }
 
+  if (target.protocol !== 'https:') {
+    return send(res, 400, 'HTTPS URLs only');
+  }
+
   if (!ALLOWLIST.includes(target.hostname)) {
     return send(res, 403, `Host not in allowlist: ${target.hostname}`);
   }

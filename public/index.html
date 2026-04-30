@@ -19,10 +19,13 @@
         <span>Tour</span>
         <select id="tour"></select>
       </label>
-      <label class="field grow">
-        <span>Scores URL</span>
-        <input id="scoresUrl" type="url" spellcheck="false" autocomplete="off" placeholder="https://…">
-      </label>
+      <details class="advanced-toggle">
+        <summary class="advanced-summary">Data source</summary>
+        <label class="field grow">
+          <span>Scores URL</span>
+          <input id="scoresUrl" type="url" spellcheck="false" autocomplete="off" placeholder="https://…">
+        </label>
+      </details>
       <label class="field grow">
         <span>YouTube URL</span>
         <input id="ytUrl" type="url" spellcheck="false" autocomplete="off" placeholder="https://youtube.com/watch?v=…">
@@ -30,7 +33,7 @@
       <button id="refreshNow" type="button" title="Refresh now">↻</button>
       <button id="togglePause" type="button" title="Pause/resume auto-refresh">⏸</button>
     </div>
-    <div class="status" id="status">idle</div>
+    <div class="status" id="status">ready</div>
   </header>
 
   <main class="split">
