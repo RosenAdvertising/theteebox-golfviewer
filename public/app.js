@@ -183,6 +183,23 @@ function clear(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
 }
 
+function holeClass(score, par) {
+  if (par != null) {
+    const strokes = parseInt(score, 10);
+    if (!isNaN(strokes)) {
+      if (strokes < par) return 'hole-under';
+      if (strokes === par) return 'hole-par';
+      return 'hole-over';
+    }
+  }
+  // score is a differential (ESPN) or par unknown — use sign-based coloring
+  const s = String(score).trim();
+  if (s.startsWith('-')) return 'hole-under';
+  if (s === 'E' || s === '0') return 'hole-par';
+  if (/^\+?\d/.test(s)) return 'hole-par'; // raw stroke count, par unknown → neutral
+  return 'hole-par';
+}
+
 function buildExpandRow(rounds, colSpan) {
   const tr = document.createElement('tr');
   tr.className = 'expand-row';
@@ -198,7 +215,7 @@ function buildExpandRow(rounds, colSpan) {
     label.className = 'round-label';
     label.textContent = rd.label;
     const score = document.createElement('div');
-    score.className = `round-score ${scoreClass(rd.score)}`;
+    score.className = `round-score ${holeClass(rd.score, rd.par ?? null)}`;
     score.textContent = rd.score;
     cell.appendChild(label);
     cell.appendChild(score);

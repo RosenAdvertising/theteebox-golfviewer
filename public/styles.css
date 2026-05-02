@@ -293,6 +293,10 @@ table.lb tbody tr:hover { background: #1a2230; }
 .round-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
 .round-score { font-weight: 600; font-size: 14px; }
 
+.hole-under { color: var(--accent); }
+.hole-par   { color: var(--muted); }
+.hole-over  { color: var(--red); }
+
 /* --- loading state --- */
 .table-wrap.loading { opacity: 0.35; pointer-events: none; transition: opacity 0.15s; }
 
