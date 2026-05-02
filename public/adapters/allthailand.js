@@ -29,7 +29,14 @@ function parse(html) {
     const holesPlayed = Number(todayCell.getAttribute('data-holes-played') || '0');
     const thru = holesPlayed === 18 ? 'F' : holesPlayed === 0 ? '—' : String(holesPlayed);
 
-    rows.push({ pos, score, player, country, thru, today });
+    // cells[4]..cells[n-2] are completed round scores (between country and today)
+    const expand = [];
+    for (let i = 4; i < cells.length - 1; i++) {
+      const val = cells[i].textContent.trim().split(/\s+/)[0];
+      if (val) expand.push({ label: `H${i - 3}`, score: val });
+    }
+
+    rows.push({ pos, score, player, country, thru, today, expand });
   }
   return { columns: COLUMNS, rows };
 }

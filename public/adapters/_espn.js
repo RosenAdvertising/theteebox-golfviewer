@@ -61,13 +61,21 @@ function parseFactory(league) {
         return '—';
       })();
 
+      const expand = linescores
+        .filter(ls => ls.value != null)
+        .map(ls => ({
+          label: `H${ls.period}`,
+          score: ls.displayValue ?? String(ls.value)
+        }));
+
       return {
         pos,
         score: c.score != null ? c.score : '—',
         player: athlete.displayName || athlete.fullName || '',
         country,
         thru,
-        today
+        today,
+        expand
       };
     });
 

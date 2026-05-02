@@ -191,8 +191,8 @@ The reference point is [MultiViewer for F1](https://multiviewer.app/). They've s
 
 ## Open-source hygiene
 
-- No client names, no internal Rosen Advertising paths
+- No client names, no internal company paths
 - No API keys (none needed for v0)
 - No tracking
-- All copy uses generic "user" / "you", not Toby
+- All copy uses generic "user" / "you", not the author's name
 - README pitches the project; SPEC documents the design; both are public-facing

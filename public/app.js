@@ -183,6 +183,32 @@ function clear(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
 }
 
+function buildExpandRow(rounds, colSpan) {
+  const tr = document.createElement('tr');
+  tr.className = 'expand-row';
+  tr.hidden = true;
+  const td = document.createElement('td');
+  td.colSpan = colSpan;
+  const grid = document.createElement('div');
+  grid.className = 'rounds-grid';
+  for (const rd of rounds) {
+    const cell = document.createElement('div');
+    cell.className = 'round-cell';
+    const label = document.createElement('div');
+    label.className = 'round-label';
+    label.textContent = rd.label;
+    const score = document.createElement('div');
+    score.className = `round-score ${scoreClass(rd.score)}`;
+    score.textContent = rd.score;
+    cell.appendChild(label);
+    cell.appendChild(score);
+    grid.appendChild(cell);
+  }
+  td.appendChild(grid);
+  tr.appendChild(td);
+  return tr;
+}
+
 function renderTable({ columns, rows }) {
   clear(els.tableWrap);
 
@@ -212,11 +238,12 @@ function renderTable({ columns, rows }) {
   const tbody = document.createElement('tbody');
   for (const r of rows) {
     const tr = document.createElement('tr');
+    let playerTd = null;
     for (const c of columns) {
       const td = document.createElement('td');
       const val = r[c.key] ?? '';
       td.textContent = val;
-      if (c.align === 'left') td.classList.add('player');
+      if (c.align === 'left') { td.classList.add('player'); playerTd = td; }
       if (c.key === 'score' || c.key === 'today') td.classList.add(scoreClass(val));
       if (c.key === 'country') {
         td.textContent = '';
@@ -227,7 +254,21 @@ function renderTable({ columns, rows }) {
       }
       tr.appendChild(td);
     }
-    tbody.appendChild(tr);
+
+    const hasRounds = r.expand && r.expand.length > 0;
+    if (hasRounds && playerTd) {
+      playerTd.classList.add('expandable');
+      const expandRow = buildExpandRow(r.expand, columns.length);
+      playerTd.addEventListener('click', () => {
+        const open = !expandRow.hidden;
+        expandRow.hidden = open;
+        playerTd.classList.toggle('is-expanded', !open);
+      });
+      tbody.appendChild(tr);
+      tbody.appendChild(expandRow);
+    } else {
+      tbody.appendChild(tr);
+    }
   }
   table.appendChild(tbody);
 
@@ -356,7 +397,7 @@ function applySplit(pct) {
 }
 applySplit(splitPct);
 
-els.divider.addEventListener('mousedown', () => { dragging = true; document.body.style.cursor = 'col-resize'; });
+els.divider.addEventListener('mousedown', e => { e.preventDefault(); dragging = true; document.body.style.cursor = 'col-resize'; });
 window.addEventListener('mouseup', () => {
   if (dragging) persist();
   dragging = false;
