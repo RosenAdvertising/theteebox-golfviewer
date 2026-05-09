@@ -81,7 +81,7 @@ function youtubeIdFromUrl(raw) {
   try {
     const u = new URL(raw);
     if (u.hostname === 'youtu.be') return u.pathname.slice(1) || null;
-    if (u.hostname.endsWith('youtube.com')) {
+    if (u.hostname === 'youtube.com' || u.hostname === 'www.youtube.com') {
       if (u.pathname === '/watch') return u.searchParams.get('v');
       const m = u.pathname.match(/^\/(embed|live|shorts)\/([^/]+)/);
       if (m) return m[2];
@@ -115,9 +115,12 @@ els.ytUrl.addEventListener('input', () => {
 
 // --- scores ---
 let failCount = 0;
+let loadScoresController = null;
 const MAX_FAILS = 5;
 
 async function loadScores() {
+  if (loadScoresController) loadScoresController.abort();
+  loadScoresController = new AbortController();
   const adapter = getAdapter(els.tour.value);
   const url = els.scoresUrl.value.trim();
   if (!url) {
@@ -128,12 +131,13 @@ async function loadScores() {
   setStatus('loading…', 'live');
   els.tableWrap.classList.add('loading');
   try {
-    const html = await fetchProxied(url);
+    const html = await fetchProxied(url, loadScoresController.signal);
     const data = adapter.parse(html);
     renderTable(data);
     failCount = 0;
     setStatus(`updated ${formatTime(new Date())}`, 'live');
   } catch (err) {
+    if (err.name === 'AbortError') return;
     failCount++;
     if (failCount >= MAX_FAILS) {
       showScoresMessage('Leaderboard unavailable after multiple attempts. Auto-refresh is still running — or click Refresh to try now.', 'error');
@@ -170,8 +174,8 @@ function showScoresMessage(text, kind = 'idle') {
   els.scoresMeta.textContent = '';
 }
 
-async function fetchProxied(url) {
-  const res = await fetch(`/proxy?url=${encodeURIComponent(url)}`);
+async function fetchProxied(url, signal) {
+  const res = await fetch(`/proxy?url=${encodeURIComponent(url)}`, { signal });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
     throw new Error(`proxy ${res.status}: ${body || res.statusText}`);
