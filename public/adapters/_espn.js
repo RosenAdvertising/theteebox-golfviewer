@@ -46,6 +46,8 @@ function parseFactory(league) {
 
       const thru = (() => {
         if (status.thru != null) return String(status.thru);
+        const isLive = competition.status?.type?.state === 'in';
+        if (isLive) return '—';
         // Fallback for non-live state: count rounds with scores
         const completed = linescores.filter(ls => ls.value != null).length;
         if (completed === 0) return '—';
@@ -64,7 +66,7 @@ function parseFactory(league) {
       const expand = linescores
         .filter(ls => ls.value != null)
         .map(ls => ({
-          label: `H${ls.period}`,
+          label: `R${ls.period}`,
           score: ls.displayValue ?? String(ls.value)
         }));
 

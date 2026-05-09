@@ -1,15 +1,12 @@
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const PUBLIC_DIR = join(__dirname, '..', 'public');
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8787;
 
-const ALLOWLIST = JSON.parse(
-  await readFile(join(__dirname, 'allowlist.json'), 'utf8')
-).hosts;
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -25,7 +22,7 @@ async function serveStatic(req, res) {
   const reqPath = req.url.split('?')[0];
   const filePath = reqPath === '/' ? '/index.html' : reqPath;
   const safe = normalize(join(PUBLIC_DIR, filePath));
-  if (!safe.startsWith(PUBLIC_DIR)) return send(res, 403, 'Forbidden');
+  if (safe !== PUBLIC_DIR && !safe.startsWith(PUBLIC_DIR + sep)) return send(res, 403, 'Forbidden');
 
   try {
     const body = await readFile(safe);
@@ -52,22 +49,22 @@ async function proxy(req, res) {
     return send(res, 400, 'HTTPS URLs only');
   }
 
-  if (!ALLOWLIST.includes(target.hostname)) {
-    return send(res, 403, `Host not in allowlist: ${target.hostname}`);
-  }
-
   try {
     const upstream = await fetch(target.toString(), {
+      redirect: 'manual',
       signal: AbortSignal.timeout(30_000),
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Teebox/0.1',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
       }
     });
+    if (upstream.status >= 300 && upstream.status < 400) {
+      return send(res, 403, 'Redirect not permitted');
+    }
     const text = await upstream.text();
     res.writeHead(upstream.status, {
       'Content-Type': 'text/html; charset=utf-8',
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': `http://localhost:${PORT}`,
       'Cache-Control': 'no-store'
     });
     res.end(text);
@@ -84,6 +81,14 @@ function send(res, status, msg) {
 const server = http.createServer((req, res) => {
   if (req.url.startsWith('/proxy')) return proxy(req, res);
   return serveStatic(req, res);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`\n  ✖  Port ${PORT} is already in use. Close the other process or set PORT=<number> and try again.\n`);
+    process.exit(1);
+  }
+  throw err;
 });
 
 server.listen(PORT, () => {
